@@ -1,0 +1,25 @@
+# Python env & caches
+venv/
+.env
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Model / training artifacts (do NOT include model files in the image)
+models/
+model/
+checkpoints/
+checkpoints_*/
+datasets/
+data/
+*.pt
+*.pth
+*.bin
+*.ckpt
+
+# OS / tools / IDE
+.ipynb_checkpoints/
+.vscode/
+.idea/
+.DS_Store
