@@ -1,0 +1,4 @@
+hey kamran today i was very busy with my internship project.
+This project is about to analysis Nifty500 and suggest weather a person should buy or sell.
+For this project i have to create an automation in n8n that checks the Nifty500 and their history price changes.
+then it gives a result for a person to buy or sell .so i created this project ,it was very intresting i learnt very things.

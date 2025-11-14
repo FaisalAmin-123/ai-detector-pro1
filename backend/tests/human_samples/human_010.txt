@@ -1,0 +1,4 @@
+Dear sir,
+i wanted to update you about today’s tasks: first i have to create 50+ test sample that train our model bit more to give accuracy.And then i will add brustiness analysis that helps to analyze text more and increases accuracy. i am hoping to increase accuracy to 85% .And then start copilot studio plannig.this is all for today’s task.
+Thankyou sir,
+Faisal.

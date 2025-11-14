@@ -1,0 +1,1 @@
+Data analysis is a field of analyzing the raw data and make it clean so that a user uses it for analysis . Data analysist must know the following skills like python ,sql ,power bi and other things .

@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI Detector Comparison - Your System vs Qwen3</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --secondary: #06b6d4;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --bg-dark: #0f172a;
+      --bg-card: #1e293b;
+      --bg-elevated: #334155;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --border: #334155;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: 
+        radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header */
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+      animation: fadeIn 0.6s ease;
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .logo-icon {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 900;
+      box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.4rem 1rem;
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-top: 1rem;
+    }
+
+    /* Navigation */
+    .nav {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .nav-link {
+      padding: 0.75rem 1.5rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text-primary);
+      text-decoration: none;
+      transition: all 0.3s ease;
+      font-weight: 600;
+    }
+
+    .nav-link:hover {
+      background: var(--bg-elevated);
+      transform: translateY(-2px);
+    }
+
+    .nav-link.active {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    }
+
+    /* Input Section */
+    .card {
+      background: var(--bg-card);
+      border-radius: 24px;
+      padding: 2.5rem;
+      border: 1px solid var(--border);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      margin-bottom: 2rem;
+      animation: slideUp 0.6s ease;
+      position: relative;
+    }
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 0.75rem;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 180px;
+      padding: 1.25rem;
+      background: var(--bg-dark);
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      color: var(--text-primary);
+      font-size: 1rem;
+      font-family: inherit;
+      resize: vertical;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+
+    textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    }
+
+    textarea::placeholder {
+      color: var(--text-secondary);
+      opacity: 0.5;
+    }
+
+    /* Buttons */
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 0.875rem 1.75rem;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-secondary {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--border);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    /* Loading State */
+    .loading {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      border-radius: 24px;
+      z-index: 10;
+    }
+
+    .loading.show {
+      display: flex;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    /* Comparison Results */
+    .results {
+      display: none;
+      animation: fadeIn 0.6s ease;
+    }
+
+    .results.show {
+      display: block;
+    }
+
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .result-card {
+      background: var(--bg-card);
+      border-radius: 20px;
+      padding: 2rem;
+      border: 2px solid var(--border);
+      transition: all 0.3s ease;
+    }
+
+    .result-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .result-card.winner {
+      border-color: var(--warning);
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
+    }
+
+    .system-name {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .system-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      background: rgba(99, 102, 241, 0.1);
+      color: var(--primary);
+    }
+
+    .winner-badge {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--warning);
+    }
+
+    .prediction-display {
+      text-align: center;
+      margin: 1.5rem 0;
+    }
+
+    .prediction-value {
+      font-size: 2rem;
+      font-weight: 900;
+      margin-bottom: 0.5rem;
+    }
+
+    .prediction-value.ai {
+      color: var(--danger);
+    }
+
+    .prediction-value.human {
+      color: var(--success);
+    }
+
+    .confidence-display {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+    }
+
+    .confidence-bar {
+      width: 100%;
+      height: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 1rem;
+    }
+
+    .confidence-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .confidence-fill.ai {
+      background: linear-gradient(90deg, var(--danger), #dc2626);
+    }
+
+    .confidence-fill.human {
+      background: linear-gradient(90deg, var(--success), #059669);
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .metric {
+      text-align: center;
+      padding: 1rem;
+      background: var(--bg-dark);
+      border-radius: 12px;
+    }
+
+    .metric-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .metric-value {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-top: 0.25rem;
+    }
+
+    /* Agreement Section */
+    .agreement-card {
+      background: var(--bg-card);
+      border-radius: 20px;
+      padding: 2rem;
+      border: 2px solid var(--border);
+      text-align: center;
+    }
+
+    .agreement-card.agree {
+      border-color: var(--success);
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(5, 150, 105, 0.05));
+    }
+
+    .agreement-card.disagree {
+      border-color: var(--danger);
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.05), rgba(220, 38, 38, 0.05));
+    }
+
+    .agreement-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .agreement-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .agreement-desc {
+      color: var(--text-secondary);
+      margin-bottom: 1.5rem;
+    }
+
+    .comparison-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .stat {
+      padding: 1rem;
+      background: var(--bg-dark);
+      border-radius: 12px;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+    }
+
+    .stat-value {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-top: 0.25rem;
+    }
+
+    /* Error Message */
+    .error {
+      display: none;
+      padding: 1rem;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 12px;
+      color: var(--danger);
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .error.show {
+      display: block;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
+      }
+
+      h1 {
+        font-size: 1.75rem;
+      }
+
+      .comparison-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .comparison-stats {
+        grid-template-columns: 1fr;
+      }
+
+      .metrics {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">
+        <div class="logo-icon">⚖️</div>
+      </div>
+      <h1>AI Detector Comparison</h1>
+      <p class="subtitle">Compare Your Hybrid System (13 Methods) vs Qwen3 Alternative</p>
+      <span class="badge">🔬 Side-by-Side Analysis</span>
+    </header>
+
+    <!-- Navigation -->
+    <div class="nav">
+      <a href="index.html" class="nav-link">← Back to Main Detector</a>
+      <a href="comparison.html" class="nav-link active">Comparison Mode</a>
+    </div>
+
+    <!-- Input Section -->
+    <div class="card">
+      <div class="loading" id="loading">
+        <div style="text-align: center;">
+          <div class="spinner"></div>
+          <div style="margin-top: 1rem; color: var(--text-primary); font-weight: 600;">
+            Running both detectors...
+          </div>
+        </div>
+      </div>
+
+      <label for="textInput">
+        Enter or paste text to compare both systems
+        <span style="float: right; color: var(--text-secondary);" id="charCount">0 characters</span>
+      </label>
+      
+      <textarea 
+        id="textInput" 
+        placeholder="Paste your text here (minimum 20 characters)..."
+      ></textarea>
+
+      <div class="button-group">
+        <button class="btn-primary" id="compareBtn">
+          <span>⚖️</span> Compare Both Systems
+        </button>
+        <button class="btn-secondary" id="clearBtn">
+          <span>🗑</span> Clear
+        </button>
+        <button class="btn-secondary" id="exampleAI">
+          Try AI Sample
+        </button>
+        <button class="btn-secondary" id="exampleHuman">
+          Try Human Sample
+        </button>
+      </div>
+
+      <div class="error" id="error"></div>
+    </div>
+
+    <!-- Results Section -->
+    <div class="results" id="results">
+      <!-- Comparison Grid -->
+      <div class="comparison-grid">
+        <!-- Your System -->
+        <div class="result-card" id="yourSystemCard">
+          <div class="system-name">
+            🔬 Your Hybrid System
+            <span class="system-badge" id="yourBadge">13 Methods</span>
+          </div>
+
+          <div class="prediction-display">
+            <div class="prediction-value" id="yourPrediction">—</div>
+            <div class="confidence-display" id="yourConfidence">—%</div>
+            <div class="confidence-bar">
+              <div class="confidence-fill" id="yourConfidenceFill" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <div class="metrics">
+            <div class="metric">
+              <div class="metric-label">Agreement</div>
+              <div class="metric-value" id="yourAgreement">—</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Processing Time</div>
+              <div class="metric-value" id="yourTime">—s</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Qwen3 Alternative -->
+        <div class="result-card" id="qwenCard">
+          <div class="system-name">
+            🤖 Qwen3 Alternative
+            <span class="system-badge" id="qwenBadge">Enhanced Heuristic</span>
+          </div>
+
+          <div class="prediction-display">
+            <div class="prediction-value" id="qwenPrediction">—</div>
+            <div class="confidence-display" id="qwenConfidence">—%</div>
+            <div class="confidence-bar">
+              <div class="confidence-fill" id="qwenConfidenceFill" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <div class="metrics">
+            <div class="metric">
+              <div class="metric-label">Method</div>
+              <div class="metric-value" id="qwenMethod">—</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Processing Time</div>
+              <div class="metric-value" id="qwenTime">—s</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agreement Analysis -->
+      <div class="agreement-card" id="agreementCard">
+        <div class="agreement-icon" id="agreementIcon">—</div>
+        <div class="agreement-title" id="agreementTitle">—</div>
+        <div class="agreement-desc" id="agreementDesc">—</div>
+
+        <div class="comparison-stats">
+          <div class="stat">
+            <div class="stat-label">Confidence Diff</div>
+            <div class="stat-value" id="confDiff">—%</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Faster System</div>
+            <div class="stat-value" id="fasterSystem">—</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Overall</div>
+            <div class="stat-value" id="overall" style="font-size: 0.9rem;">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = window.location.hostname === 'localhost' 
+    ? 'http://localhost:5000'
+    : 'https://ai-detector-pro.onrender.com';
+
+    const examples = {
+      ai: "Machine learning algorithms have revolutionized artificial intelligence. These sophisticated systems demonstrate remarkable capabilities in data processing and pattern recognition. The implementation of neural networks enables advanced computational functionality across many domains. Modern AI continues to evolve with unprecedented sophistication.",
+      human: "omg you won't believe what happened today!! so i was literally just sitting there and this random guy spills coffee on my laptop. like seriously?? i was so mad lol but he apologized and offered to buy me a new one. anyway how's your day been? mine's been absolutely crazy haha"
+    };
+
+    // Elements
+    const textInput = document.getElementById('textInput');
+    const charCount = document.getElementById('charCount');
+    const compareBtn = document.getElementById('compareBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const loading = document.getElementById('loading');
+    const error = document.getElementById('error');
+    const results = document.getElementById('results');
+
+    // Event Listeners
+    textInput.addEventListener('input', updateCharCount);
+    compareBtn.addEventListener('click', compare);
+    clearBtn.addEventListener('click', clear);
+    document.getElementById('exampleAI').addEventListener('click', () => loadExample('ai'));
+    document.getElementById('exampleHuman').addEventListener('click', () => loadExample('human'));
+
+    function updateCharCount() {
+      charCount.textContent = textInput.value.length + ' characters';
+    }
+
+    function loadExample(type) {
+      textInput.value = examples[type];
+      updateCharCount();
+    }
+
+    function clear() {
+      textInput.value = '';
+      updateCharCount();
+      results.classList.remove('show');
+      error.classList.remove('show');
+    }
+
+    function showError(msg) {
+      error.textContent = msg;
+      error.classList.add('show');
+      setTimeout(() => error.classList.remove('show'), 5000);
+    }
+
+    function setLoading(show) {
+      loading.classList.toggle('show', show);
+      compareBtn.disabled = show;
+    }
+
+    async function compare() {
+      const text = textInput.value.trim();
+      
+      if (!text || text.length < 20) {
+        showError('Please enter at least 20 characters');
+        return;
+      }
+
+      error.classList.remove('show');
+      setLoading(true);
+
+      try {
+        const response = await fetch(API_URL + '/analyze/compare', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text })
+        });
+
+        if (!response.ok) throw new Error('Comparison failed');
+
+        const data = await response.json();
+        console.log('Comparison Result:', data);
+        displayComparison(data);
+      } catch (err) {
+        console.error(err);
+        showError('Cannot connect to API. Make sure the backend is running on port 5000.');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    function displayComparison(data) {
+      results.classList.add('show');
+
+      const yourSystem = data.your_system || {};
+      const qwen = data.qwen3 || {};
+      const comparison = data.comparison || {};
+
+      // Your System Card
+      if (!yourSystem.error) {
+        const isAI = yourSystem.is_ai_generated;
+        document.getElementById('yourPrediction').textContent = yourSystem.label || '—';
+        document.getElementById('yourPrediction').className = 'prediction-value ' + (isAI ? 'ai' : 'human');
+        document.getElementById('yourConfidence').textContent = (yourSystem.confidence || 0).toFixed(1) + '%';
+        document.getElementById('yourAgreement').textContent = yourSystem.agreement || '—';
+        document.getElementById('yourTime').textContent = (yourSystem.processing_time || 0).toFixed(1) + 's';
+
+        const yourFill = document.getElementById('yourConfidenceFill');
+        yourFill.className = 'confidence-fill ' + (isAI ? 'ai' : 'human');
+        setTimeout(() => {
+          yourFill.style.width = (yourSystem.confidence || 0) + '%';
+        }, 100);
+      }
+
+      // Qwen Card
+      if (!qwen.error) {
+        const isAI = qwen.is_ai_generated;
+        document.getElementById('qwenPrediction').textContent = qwen.label || '—';
+        document.getElementById('qwenPrediction').className = 'prediction-value ' + (isAI ? 'ai' : 'human');
+        document.getElementById('qwenConfidence').textContent = (qwen.confidence || 0).toFixed(1) + '%';
+        document.getElementById('qwenMethod').textContent = qwen.method || '—';
+        document.getElementById('qwenTime').textContent = (qwen.processing_time || 0).toFixed(2) + 's';
+
+        const qwenFill = document.getElementById('qwenConfidenceFill');
+        qwenFill.className = 'confidence-fill ' + (isAI ? 'ai' : 'human');
+        setTimeout(() => {
+          qwenFill.style.width = (qwen.confidence || 0) + '%';
+        }, 100);
+      }
+
+      // Highlight winner (higher confidence)
+      const yourCard = document.getElementById('yourSystemCard');
+      const qwenCard = document.getElementById('qwenCard');
+      yourCard.classList.remove('winner');
+      qwenCard.classList.remove('winner');
+
+      if (yourSystem.confidence > qwen.confidence) {
+        yourCard.classList.add('winner');
+        document.getElementById('yourBadge').className = 'system-badge winner-badge';
+        document.getElementById('yourBadge').textContent = '👑 Higher Confidence';
+      } else if (qwen.confidence > yourSystem.confidence) {
+        qwenCard.classList.add('winner');
+        document.getElementById('qwenBadge').className = 'system-badge winner-badge';
+        document.getElementById('qwenBadge').textContent = '👑 Higher Confidence';
+      }
+
+      // Agreement Card
+      const agreementCard = document.getElementById('agreementCard');
+      if (comparison.agreement_status === 'agree') {
+        agreementCard.className = 'agreement-card agree';
+        document.getElementById('agreementIcon').textContent = '✅';
+        document.getElementById('agreementTitle').textContent = 'Both Systems Agree!';
+      } else {
+        agreementCard.className = 'agreement-card disagree';
+        document.getElementById('agreementIcon').textContent = '⚠️';
+        document.getElementById('agreementTitle').textContent = 'Systems Disagree';
+      }
+
+      document.getElementById('agreementDesc').textContent = comparison.agreement_message || '—';
+      document.getElementById('confDiff').textContent = (comparison.confidence_difference || 0).toFixed(1) + '%';
+      document.getElementById('fasterSystem').textContent = comparison.speed_comparison?.faster || '—';
+      document.getElementById('overall').textContent = comparison.overall || '—';
+    }
+  </script>
+</body>
+</html>
